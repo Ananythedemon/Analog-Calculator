@@ -1,0 +1,590 @@
+kind of interfacing
+
+#include <string.h>
+#include<Arduino.h>
+
+String exp_maker(String s){
+  int strl = s.length();
+  
+  for(int i=0;i<strl;i++){
+    if(s[i] == '.'){
+      if((i-2)>=0 && (s[i-2]<48 || s[i-2]>57)){
+        String s1,s2;
+        s1=s.substring(0,i-1);
+        s2=s.substring(i-1);
+        s = s1+0+s2;
+        strl=s.length();
+        i=0;
+      
+      }
+      else if(i-2<0){
+        s=0+s;
+        strl=s.length();
+        i=0;
+      }
+    }
+  }
+  return s;
+}
+
+String exp_solver(String s){
+  
+   float ans;
+  int strl = s.length();
+  for (int k=1; k<strl; k++){
+    float op1, op2;
+    char op;
+    bool op1neg,op2neg;
+    //float ans;
+    if (s[k] == 'r'){
+      op = s[k];
+      String s1,s2;
+      if(s[k+1] !='-'){     
+        op2= (((float)s[k+5]-48)/100) + (((float)s[k+4]-48)/10) + ((float)s[k+2]-48) + 10*((float)s[k+1]-48);
+      }
+      else {
+        op2= (((float)s[k+6]-48)/100) + (((float)s[k+5]-48)/10) + ((float)s[k+3]-48) + 10*((float)s[k+2]-48);
+      }
+      op1= (((float)s[k-1]-48)/100) + (((float)s[k-2]-48)/10) + ((float)s[k-4]-48) + 10*((float)s[k-5]-48);
+
+      if(s[k-6] == '-'){
+        Serial.print( -1*op1);
+        op1neg=1;
+      }
+      else{
+        Serial.print(op1);
+        op1neg=0;
+      }
+      Serial.print(op);
+      
+      if(s[k+1] == '-'){
+        Serial.println( -1*op2);
+        op2neg=1;
+      }
+      else{
+        Serial.println(op2);
+        op2neg=0;
+      }
+
+      while(Serial.available() == 0) {}
+      String ans1=Serial.readString();
+      if(ans1[0] != '-'){
+          if(s[k-6] != '-' && s[k+1] != '-') s.remove(k-5,11);
+          else if(s[k-6] != '-' && s[k+1] == '-') s.remove(k-5,12);
+          else if(s[k-6] == '-' && s[k+1] != '-') s.remove(k-6,12);
+          else s.remove(k-6,13);
+          
+      
+          if(op1neg == 1){
+           s1=s.substring(0,k-6);
+           s2=s.substring(k-6);
+          }
+          else {
+            s1=s.substring(0,k-5);
+           s2=s.substring(k-5);
+          }
+          //Serial.println("s1 and s2 aare ");
+          //Serial.println(s1);
+          //Serial.println(s2);
+         char c = '+';
+        if (ans1[1] == '.'){
+          ans1.remove(4);
+          
+          if (op1neg == 1 && s1.length()!=0) s=s1+c+0+ans1+s2;
+          else s=s1+0+ans1+s2;
+        }
+        else{  
+          ans1.remove(5);
+          if (op1neg == 1 && s1.length()!=0) s=s1+c+ans1+s2;
+          else s=s1+ans1+s2;
+        }
+      }
+
+      else{  //ANS IS NEGATIVE
+        if(s[k-6] != '-' && s[k+1] != '-') s.remove(k-5,11);
+          else if(s[k-6] != '-' && s[k+1] == '-') s.remove(k-5,12);
+          else if(s[k-6] == '-' && s[k+1] != '-') s.remove(k-6,12);
+          else s.remove(k-6,13);
+          
+          if(op1neg == 1){
+           s1=s.substring(0,k-6);
+           s2=s.substring(k-6);
+          }
+          else {
+            s1=s.substring(0,k-5);
+           s2=s.substring(k-5);
+          }
+          //Serial.println("s1 and s2 aare ");
+      //Serial.println(s1);
+      //Serial.println(s2);
+
+          if(ans1[2]=='.'){
+          ans1.remove(5);
+          s=s1+ans1.substring(0,1)+0+ans1.substring(1)+s2;
+          }
+
+          else {
+            ans1.remove(6);
+          s=s1+ans1+s2;
+
+          }
+      }
+      //Serial.print("s is ");
+      //Serial.println(s);
+      strl = s.length();
+      k=0;
+    }
+  }
+
+  ////////////////////////////////////////////////////////////////////////////////
+  
+  for (int k=1; k<strl; k++){
+    float op1, op2;
+    char op;
+    bool op1neg,op2neg;
+    if (s[k] == '*'){
+      op = s[k];
+      String s1,s2;
+      if(s[k+1] !='-'){     
+        op2= (((float)s[k+5]-48)/100) + (((float)s[k+4]-48)/10) + ((float)s[k+2]-48) + 10*((float)s[k+1]-48);
+      }
+      else {
+        op2= (((float)s[k+6]-48)/100) + (((float)s[k+5]-48)/10) + ((float)s[k+3]-48) + 10*((float)s[k+2]-48);
+      }
+      op1= (((float)s[k-1]-48)/100) + (((float)s[k-2]-48)/10) + ((float)s[k-4]-48) + 10*((float)s[k-5]-48);
+
+      if(s[k-6] == '-'){
+        Serial.print( -1*op1);
+        op1neg=1;
+        
+      }
+      else{
+        Serial.print(op1);
+        op1neg=0;
+      }
+      Serial.print(op);
+
+      if(s[k+1] == '-'){
+        Serial.println( -1*op2);
+        op2neg=1;
+      }
+      else{
+        Serial.println(op2);
+        op2neg=0;
+      }
+      
+      Serial.print("inputs are ");
+      Serial.println(op1);
+      Serial.println(op);
+      Serial.println(op2);   
+      while(Serial.available() == 0) {}
+      String ans1=Serial.readString();
+      if(ans1[0] != '-'){
+          if(s[k-6] != '-' && s[k+1] != '-') s.remove(k-5,11);
+          else if(s[k-6] != '-' && s[k+1] == '-') s.remove(k-5,12);
+          else if(s[k-6] == '-' && s[k+1] != '-') s.remove(k-6,12);
+          else s.remove(k-6,13);
+          
+      
+          //Serial.print("s is ");
+          //Serial.println(s);
+          if(op1neg == 1){
+           s1=s.substring(0,k-6);
+           s2=s.substring(k-6);
+          }
+          else {
+            s1=s.substring(0,k-5);
+           s2=s.substring(k-5);
+          }
+          //Serial.println("s1 and s2 aare ");
+          //Serial.println(s1);
+          //Serial.println(s2);
+         char c = '+';
+         char m = '-';
+        if (ans1[1] == '.'){
+          ans1.remove(4);
+          
+          if (op1neg == 1 && op2neg == 1 && s1.length()!=0) s=s1+c+0+ans1+s2;
+          else if (op1neg == 0 && op2neg == 1 ) s=s1+m+0+ans1+s2;
+          else if (op1neg == 1 && op2neg == 0 ) s=s1+m+0+ans1+s2;
+          else s=s1+0+ans1+s2;
+        }
+        else{  
+           if (op1neg == 1 && op2neg == 1 && s1.length()!=0) s=s1+c+ans1+s2;
+          else if (op1neg == 0 && op2neg == 1 ) s=s1+m+ans1+s2;
+          else if (op1neg == 1 && op2neg == 0 ) s=s1+m+ans1+s2;
+          else s=s1+ans1+s2;
+        }
+      }
+
+      /*else{  //ANS IS NEGATIVE
+        if(s[k-6] != '-' && s[k+1] != '-') s.remove(k-5,11);
+          else if(s[k-6] != '-' && s[k+1] == '-') s.remove(k-5,12);
+          else if(s[k-6] == '-' && s[k+1] != '-') s.remove(k-6,12);
+          else s.remove(k-6,13);
+          
+          if(op1neg == 1){
+           s1=s.substring(0,k-6);
+           s2=s.substring(k-6);
+          }
+          else {
+            s1=s.substring(0,k-5);
+           s2=s.substring(k-5);
+          }
+          //Serial.println("s1 and s2 aare ");
+          //Serial.println(s1);
+          //Serial.println(s2);
+
+          if(ans1[2]=='.'){
+          ans1.remove(5);
+          s=s1+ans1.substring(0,1)+0+ans1.substring(1)+s2;
+          }
+          else {
+            ans1.remove(6);
+          s=s1+ans1+s2;
+          }
+      }*/
+      //Serial.print("s is ");
+      //Serial.println(s);
+      strl = s.length();
+      k=0;
+    }
+  }
+  
+//////////////////////////////////////////////////////////////////////////////////////
+
+  for (int k=1; k<strl; k++){
+    float op1, op2;
+    char op;
+    bool op1neg,op2neg;
+    if (s[k] == '+'){
+      op = s[k];
+      String s1,s2;
+      if(s[k+1] !='-'){     
+        op2= (((float)s[k+5]-48)/100) + (((float)s[k+4]-48)/10) + ((float)s[k+2]-48) + 10*((float)s[k+1]-48);
+      }
+      else {
+        op2= (((float)s[k+6]-48)/100) + (((float)s[k+5]-48)/10) + ((float)s[k+3]-48) + 10*((float)s[k+2]-48);
+      }
+      op1= (((float)s[k-1]-48)/100) + (((float)s[k-2]-48)/10) + ((float)s[k-4]-48) + 10*((float)s[k-5]-48);
+
+      if(s[k-6] == '-'){
+        Serial.print( -1*op1);
+        op1neg=1;
+      }
+      else{
+        Serial.print(op1);
+        op1neg=0;
+      }
+      Serial.print(op);      //DO NOT SEND OP HEREEEEEEEE!!!!!!!!!!!!!!!!!!!!!!
+
+      if(s[k+1] == '-'){
+        Serial.println( -1*op2);
+        op2neg=1;
+      }
+      else{
+        Serial.println(op2);
+        op2neg=0;
+      }
+
+      Serial.print("inputs to the circuit are  ");
+      if(op1neg == 1 && op2neg == 1 ){ 
+        Serial.println(op1);
+        Serial.println(op);
+        Serial.println(op2);
+      }
+      else if(op1neg == 1 && op2neg == 0){
+        char m = '-';
+        if(op1 >= op2){
+          Serial.println(op1);
+        Serial.println(m);
+        Serial.println(op2);
+        }
+        else{
+          Serial.println(op2);
+        Serial.println(m);
+        Serial.println(op1);
+        }
+      }
+      else if(op1neg == 0 && op2neg == 1){
+        char m = '-';
+        if(op1 >= op2){
+        Serial.println(op1);
+        Serial.println(m);
+        Serial.println(op2);
+        }
+        else{
+        Serial.println(op2);
+        Serial.println(m);
+        Serial.println(op1);
+        }
+      }
+      else {
+        Serial.println(op1);
+        Serial.println(op);
+        Serial.println(op2);
+      }
+
+
+      while(Serial.available() == 0) {}
+      String ans1=Serial.readString();
+      if(ans1[0] != '-'){
+          if(s[k-6] != '-' && s[k+1] != '-') s.remove(k-5,11);
+          else if(s[k-6] != '-' && s[k+1] == '-') s.remove(k-5,12);
+          else if(s[k-6] == '-' && s[k+1] != '-') s.remove(k-6,12);
+          else s.remove(k-6,13);
+
+          if(op1neg == 1){
+           s1=s.substring(0,k-6);
+           s2=s.substring(k-6);
+          }
+          else {
+            s1=s.substring(0,k-5);
+           s2=s.substring(k-5);
+          }
+          //Serial.println("s1 and s2 aare ");
+          //Serial.println(s1);
+          //Serial.println(s2);
+         char c = '+';
+         char m = '-';
+        if (ans1[1] == '.'){
+          ans1.remove(4);
+          
+          if(op1neg == 1 && op2neg == 1 ) s=s1+m+0+ans1+s2;
+          else if (op1neg == 1 && op2neg == 0){
+            if(op1>=op2) s=s1+m+0+ans1+s2;
+            else{
+              if(s1.length()!=0) s=s1+c+0+ans1+s2;
+              else s=s1+0+ans1+s2;
+            }
+          }
+          else if (op1neg == 0 && op2neg == 1){
+            if(op1>=op2) {
+              if(s1.length() != 0 )  s=s1+c+0+ans1+s2  ;                            //////////////////////////////////////////
+              else s=s1+0+ans1+s2;
+            }
+            else s=s1+m+0+ans1+s2;            
+          }
+          else {
+            if(s1.length() != 0 )  s=s1+c+0+ans1+s2  ;                            //////////////////////////////////////////
+              else s=s1+0+ans1+s2;
+          }
+          //if (op1neg == 1 && s1.length()!=0) s=s1+c+0+ans1+s2;
+          //else s=s1+0+ans1+s2;
+        }
+        else{  
+          ans1.remove(5);
+
+          if(op1neg == 1 && op2neg == 1 ) s=s1+m+0+ans1+s2;
+          else if (op1neg == 1 && op2neg == 0){
+            if(op1>=op2) s=s1+m+ans1+s2;
+            else{
+              if(s1.length()!=0) s=s1+c+ans1+s2;
+              else s=s1+ans1+s2;
+            }
+          }
+          else if (op1neg == 0 && op2neg == 1){
+            if(op1>=op2) {
+              if(s1.length() != 0 )  s=s1+c+ans1+s2  ;                            //////////////////////////////////////////
+              else s=s1+ans1+s2;
+            }
+            else s=s1+m+ans1+s2;            
+          }
+          else {
+            if(s1.length() != 0 )  s=s1+c+ans1+s2  ;                            //////////////////////////////////////////
+              else s=s1+ans1+s2;
+          }
+          //if (op1neg == 1 && s1.length()!=0) s=s1+c+ans1+s2;
+          //else s=s1+ans1+s2;
+        }
+      }
+
+      strl = s.length();
+      k=0;
+    }
+  }
+
+  ////////////////////////////////////////////////////////////////////////////
+  
+  for (int k=1; k<strl; k++){
+    float op1, op2;
+    char op;
+    bool op1neg,op2neg;
+    if (s[k] == '-'){
+      op = s[k];
+      String s1,s2;
+      if(s[k+1] !='-'){     
+        op2= (((float)s[k+5]-48)/100) + (((float)s[k+4]-48)/10) + ((float)s[k+2]-48) + 10*((float)s[k+1]-48);
+      }
+      else {
+        op2= (((float)s[k+6]-48)/100) + (((float)s[k+5]-48)/10) + ((float)s[k+3]-48) + 10*((float)s[k+2]-48);
+      }
+      op1= (((float)s[k-1]-48)/100) + (((float)s[k-2]-48)/10) + ((float)s[k-4]-48) + 10*((float)s[k-5]-48);
+
+      if(s[k-6] == '-'){
+        Serial.print( -1*op1);
+        op1neg=1;
+      }
+      else{
+        Serial.print(op1);
+        op1neg=0;
+      }
+      Serial.print(op);
+
+      if(s[k+1] == '-'){
+        Serial.println( -1*op2);
+        op2neg=1;
+      }
+      else{
+        Serial.println(op2);
+        op2neg=0;
+      }
+      char c = '+';
+      Serial.println("Inputs to the circuit are ");
+      if(op1neg == 1 && op2neg == 0) {
+        if(op1 >= op2){
+          Serial.println(op1);
+          Serial.println(c);
+          Serial.println(op2);
+        }
+        else {
+          Serial.println(op2);
+          Serial.println(c);
+          Serial.print(op1);
+        }
+      }
+      else if(op1neg == 0 && op2neg == 0){
+        if(op1 >= op2){
+          Serial.println(op1);
+          Serial.println(op);
+          Serial.print(op2);
+        }
+        else {
+          Serial.println(op2);
+          Serial.println(op);
+          Serial.print(op1);
+        }
+      }
+
+      while(Serial.available() == 0) {}
+      String ans1=Serial.readString();
+
+      if(ans1[0] != '-'){
+          if(s[k-6] != '-' && s[k+1] != '-') s.remove(k-5,11);
+          else if(s[k-6] != '-' && s[k+1] == '-') s.remove(k-5,12);
+          else if(s[k-6] == '-' && s[k+1] != '-') s.remove(k-6,12);
+          else s.remove(k-6,13);
+          
+          if(op1neg == 1){
+           s1=s.substring(0,k-6);
+           s2=s.substring(k-6);
+          }
+          else {
+            s1=s.substring(0,k-5);
+           s2=s.substring(k-5);
+          }
+          //Serial.println("s1 and s2 aare ");
+         // Serial.println(s1);
+         // Serial.println(s2);
+         char c = '+';
+         char m = '-';
+        if (ans1[1] == '.'){
+          ans1.remove(4);
+          //if (op1neg == 1 && s1.length()!=0) s=s1+c+0+ans1+s2;
+          //else s=s1+0+ans1+s2;
+          if(op1neg == 1 && op2neg == 0) s=s1+m+0+ans1+s2;
+          else if(op1neg == 0 && op2neg == 0) {
+            if(op1>=op2) {
+              if (s1.length() != 0) s=s1+c+0+ans1+s2;
+              else s=s1+0+ans1+s2;;
+            }
+            else s=s1+m+0+ans1+s2;
+          }
+        }
+        else{  
+          ans1.remove(5);
+
+          if(op1neg == 1 && op2neg == 0) s=s1+m+ans1+s2;
+          else if(op1neg == 0 && op2neg == 0) {
+            if(op1>=op2) {
+              if (s1.length() != 0) s=s1+c+ans1+s2;
+              else s=s1+ans1+s2;;
+            }
+            else s=s1+m+ans1+s2;
+          }
+
+          //if (op1neg == 1 && s1.length()!=0) s=s1+c+ans1+s2;
+          //else s=s1+ans1+s2;
+        }
+      }
+
+      strl = s.length();
+      k=0;
+    }
+  }
+  return s;
+}
+
+void setup() {
+  pinMode(13,OUTPUT);
+ Serial.begin(9600);
+ Serial1.begin(9600);
+}
+
+ void loop() 
+{
+    String expr;
+    while(Serial1.available()==0){}
+    expr=Serial1.readString();
+    Serial.println(expr);
+    String exp_edit = expr;
+    exp_edit = exp_maker(exp_edit);
+    int strl = exp_edit.length();
+    for(int i=0; i<strl; i++){
+      
+      String exp_short;
+      if(exp_edit[i] == ')'){
+        
+        for (int j=i;j>=0;j--){
+          if(exp_edit[j] == '('){
+            String ans;
+             exp_short = exp_edit.substring(j+1,i);
+            //exp_short = exp_edit.substring(j+1,i-j);
+            //Serial.print("exp_short is ");
+           // Serial.println(exp_short);
+
+            ans=exp_solver(exp_short);           
+            exp_edit.remove(j,i-j+1);
+            //exp_edit.insert(j,ans);
+
+            String s1,s2;
+            if(ans[0] == '-' && exp_edit[j-1] == '-'){
+              s1=exp_edit.substring(0,j-1);
+              s2=exp_edit.substring(j);
+              char c = '+';
+              exp_edit=s1+c+ans.substring(1)+s2;
+            }
+            else{
+              s1=exp_edit.substring(0,j);
+              s2=exp_edit.substring(j);
+              exp_edit=s1+ans+s2;
+            }
+            //exp_edit=s1+ans+s2;
+            Serial.print("s1 and s2 are ");
+            Serial.println(s1);
+            Serial.println(s2);
+            Serial.print("exp_edit is ");
+            Serial.println(exp_edit);            
+
+            strl = exp_edit.length();
+            i=0;
+            break;
+          } 
+        }
+      } 
+    }
+    String final;
+    final=exp_solver(exp_edit);
+    Serial.print("final ans   ");
+    Serial.println(final);
+}
